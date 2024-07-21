@@ -6,8 +6,8 @@ import (
 )
 
 type BlockChain struct {
-	TransactionPool []string
-	Chain           []*Block
+	transactionPool []*Transaction
+	chain           []*Block
 }
 
 func NewBlockChain() *BlockChain {
@@ -18,23 +18,30 @@ func NewBlockChain() *BlockChain {
 }
 
 
-func (bc *BlockChain) AddNewBlock(nonce int, previousHash [32]byte) {
-    bc.Chain = append(bc.Chain, NewBlock(nonce, previousHash))
+func (bc *BlockChain) AddNewBlock(nonce int, previousHash [32]byte) *Block {
+    bc.chain = append(bc.chain, NewBlock(nonce, previousHash, bc.transactionPool))
+    bc.transactionPool = []*Transaction{}
+    return bc.chain[len(bc.chain)-1]
+}
+
+func (bc *BlockChain) AddTransaction(sender, recipient string, value float32) {
+    t := NewTransaction(sender, recipient, value)
+    bc.transactionPool = append(bc.transactionPool, t)
 }
 
 func (bc *BlockChain) LastBlock() *Block {
-    return bc.Chain[len(bc.Chain)-1]
+    return bc.chain[len(bc.chain)-1]
 }
 
 func (bc *BlockChain) Print() {
-    for i, blck := range bc.Chain {
+    for i, blck := range bc.chain {
         fmt.Printf(
             "%s Chain %d %s\n", 
-            strings.Repeat("=", 25), 
-            i, strings.Repeat("=", 25),
+            strings.Repeat("=", 35), 
+            i, strings.Repeat("=", 35),
         )
         blck.Print()
     }
-    fmt.Printf("%s\n", strings.Repeat("*", 25))
+    fmt.Printf("\n%s\n", strings.Repeat("*", 79))
 }
 
